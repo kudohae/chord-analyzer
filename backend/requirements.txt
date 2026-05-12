@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+python-multipart
+numpy
+scipy
+librosa
+soundfile
+torch
+torchaudio
+PyYAML
+mir_eval
+pretty_midi
