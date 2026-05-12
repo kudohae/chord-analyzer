@@ -3,10 +3,12 @@ import WaveSurfer from 'wavesurfer.js';
 
 interface Props {
   audioUrl: string;
+  onTimeUpdate?: (time: number) => void;
 }
 
 export default function Waveform({
-  audioUrl
+  audioUrl,
+  onTimeUpdate
 }: Props) {
   const containerRef =
     useRef<HTMLDivElement>(null);
@@ -24,6 +26,14 @@ export default function Waveform({
 
     wave.load(audioUrl);
 
+    wave.on('interaction', () => {
+      wave.playPause();
+    });
+
+    wave.on('timeupdate', (time) => {
+      onTimeUpdate?.(time);
+    });
+
     return () => {
       wave.destroy();
     };
@@ -33,7 +43,8 @@ export default function Waveform({
     <div
       ref={containerRef}
       style={{
-        marginTop: '30px'
+        marginTop: '30px',
+        cursor: 'pointer'
       }}
     />
   );
