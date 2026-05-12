@@ -6,6 +6,7 @@ from fastapi.middleware.cors import (
     CORSMiddleware
 )
 
+import os
 import tempfile
 
 from analysis import analyze_audio
@@ -35,7 +36,10 @@ async def analyze(
 
         path = tmp.name
 
-    chords = analyze_audio(path)
+    try:
+        chords = analyze_audio(path)
+    finally:
+        os.unlink(path)
 
     return {
         'chords': chords

@@ -1,3 +1,4 @@
+import gc
 import torch
 import numpy as np
 
@@ -38,6 +39,7 @@ model.load_state_dict(
     checkpoint['model']
 )
 
+model.half()
 model.eval()
 
 idx_to_chord = idx2voca_chord()
@@ -83,7 +85,7 @@ def analyze_audio(path):
 
     feature = torch.tensor(
         feature,
-        dtype=torch.float32
+        dtype=torch.float16
     ).unsqueeze(0).to(device)
 
     lines = []
@@ -142,5 +144,8 @@ def analyze_audio(path):
                     start_time = end_time
 
                     prev_chord = current
+
+    del feature
+    gc.collect()
 
     return lines

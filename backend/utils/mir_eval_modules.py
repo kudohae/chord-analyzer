@@ -28,6 +28,7 @@ def idx2voca_chord():
 
 def audio_file_to_features(audio_file, config):
     original_wav, sr = librosa.load(audio_file, sr=config.mp3['song_hz'], mono=True)
+    song_length_second = len(original_wav) / config.mp3['song_hz']
     currunt_sec_hz = 0
     while len(original_wav) > currunt_sec_hz + config.mp3['song_hz'] * config.mp3['inst_len']:
         start_idx = int(currunt_sec_hz)
@@ -39,10 +40,10 @@ def audio_file_to_features(audio_file, config):
             feature = np.concatenate((feature, tmp), axis=1)
         currunt_sec_hz = end_idx
     tmp = librosa.cqt(original_wav[currunt_sec_hz:], sr=sr, n_bins=config.feature['n_bins'], bins_per_octave=config.feature['bins_per_octave'], hop_length=config.feature['hop_length'])
+    del original_wav
     feature = np.concatenate((feature, tmp), axis=1)
     feature = np.log(np.abs(feature) + 1e-6)
     feature_per_second = config.mp3['inst_len'] / config.model['timestep']
-    song_length_second = len(original_wav)/config.mp3['song_hz']
     return feature, feature_per_second, song_length_second
 
 # Audio files with format of wav and mp3
