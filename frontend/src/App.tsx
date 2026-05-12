@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 import Waveform from './components/Waveform';
 
@@ -11,6 +11,14 @@ export default function App() {
 
   const [result, setResult] =
     useState<any>(null);
+
+  const [currentTime, setCurrentTime] =
+    useState(0);
+
+  const handleTimeUpdate =
+    useCallback((time: number) => {
+      setCurrentTime(time);
+    }, []);
 
   async function handleFile(
     file: File
@@ -56,6 +64,7 @@ export default function App() {
       {audioUrl && (
         <Waveform
           audioUrl={audioUrl}
+          onTimeUpdate={handleTimeUpdate}
         />
       )}
 
@@ -68,30 +77,44 @@ export default function App() {
           }}
         >
           {result.chords.map(
-  (c: any, idx: number) => (
-    <div
-      key={idx}
-      style={{
-        padding: '8px',
-        borderBottom:
-          '1px solid #333'
-      }}
-    >
-      <strong>
-        {c.start.toFixed(2)}s
-      </strong>
+  (c: any, idx: number) => {
+    const active =
+      currentTime >= c.start &&
+      currentTime < c.end;
+    return (
+      <div
+        key={idx}
+        style={{
+          padding: '8px',
+          borderBottom:
+            '1px solid #333',
+          background: active
+            ? '#1a3a1a'
+            : 'transparent',
+          color: active
+            ? '#4cff4c'
+            : 'white',
+          fontWeight: active
+            ? 'bold'
+            : 'normal'
+        }}
+      >
+        <strong>
+          {c.start.toFixed(2)}s
+        </strong>
 
-      {'  →  '}
+        {'  →  '}
 
-      <strong>
-        {c.end.toFixed(2)}s
-      </strong>
+        <strong>
+          {c.end.toFixed(2)}s
+        </strong>
 
-      {'   '}
+        {'   '}
 
-      {c.chord}
-    </div>
-  )
+        {c.chord}
+      </div>
+    );
+  }
 )}
         </pre>
       )}
